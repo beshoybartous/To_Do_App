@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/navigation_graph"
+    app:startDestination="@id/to_do_list_fragment">
+
+    <fragment
+        android:id="@+id/to_do_list_fragment"
+        android:name="com.example.todoapp.ui.mainactivity.to_do_list.ToDoListFragment"
+        android:label="ToDoListFragment" />
+    <fragment
+        android:id="@+id/category_list_fragment"
+        android:name="com.example.todoapp.ui.mainactivity.categories_list.CategoriesListFragment"
+        android:label="CategoriesListFragment" />
+</navigation>

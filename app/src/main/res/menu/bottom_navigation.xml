@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/to_do_list_fragment"
+        android:title="To Do"
+        android:icon="@drawable/ic_list"/>
+    <item
+        android:id="@+id/category_list_fragment"
+        android:title="Categories"
+        android:icon="@drawable/ic_category"/>
+
+</menu>
