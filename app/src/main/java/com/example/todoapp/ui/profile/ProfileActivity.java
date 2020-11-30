@@ -3,8 +3,12 @@ package com.example.todoapp.ui.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
+
+import androidx.core.app.ActivityOptionsCompat;
 
 import com.example.todoapp.base.BaseActivity;
+import com.example.todoapp.cache.SharedPref;
 import com.example.todoapp.model.MessageEvent;
 import com.example.todoapp.databinding.ActivityProfileBinding;
 import com.example.todoapp.model.UserModel;
@@ -40,17 +44,18 @@ public class ProfileActivity extends BaseActivity<ProfilePresenter, ActivityProf
 
     @Override
     protected void onPostCreated() {
+        showBackButton();
         if(getIntent().getSerializableExtra(KEY_USER_MODEL)!=null){
             userModel= (UserModel) getIntent().getSerializableExtra(KEY_USER_MODEL);
             loadData();
         }
-
+        presenter.checkAccountType();
         viewBinding.btnSignOut.setOnClickListener(view -> {
             presenter.signOut();
         });
         viewBinding.btnEdit.setOnClickListener(view -> {
             if(userModel!=null) {
-                EditProfileActivity.startEditProfileActivity(this, userModel);
+                EditProfileActivity.startEditProfileActivity(this,viewBinding.cvUserImage, userModel);
             }
         });
         viewBinding.btnChangePassword.setOnClickListener(view -> {
@@ -59,7 +64,7 @@ public class ProfileActivity extends BaseActivity<ProfilePresenter, ActivityProf
     }
 
     private void loadData(){
-        Picasso.with(viewBinding.getRoot().getContext()).load( userModel.getImageUri()).into(viewBinding.ivUserImage);
+        Picasso.get().load( userModel.getImageUri()).into(viewBinding.ivUserImage);
         viewBinding.tvEmail.setText(userModel.getEmail());
         viewBinding.tvDisplayName.setText(userModel.getDisplayName());
     }
@@ -78,7 +83,6 @@ public class ProfileActivity extends BaseActivity<ProfilePresenter, ActivityProf
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void eventData(MessageEvent event){
-        Log.d("eventbusss", "edit: ");
         presenter.getUserInfo();
     }
 
@@ -91,6 +95,12 @@ public class ProfileActivity extends BaseActivity<ProfilePresenter, ActivityProf
     @Override
     public void signOut() {
         LoginActivity.startLoginActivity(this);
+        SharedPref.clear();
         finish();
+    }
+
+    @Override
+    public void socialMediaLogin() {
+        viewBinding.btnChangePassword.setVisibility(View.GONE);
     }
 }

@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ToDoView extends BaseView {
     void getCategoriesView(List<CategoryModel> categoryModelList);
-    void saved(boolean successful);
+    void saved( );
 }

@@ -24,8 +24,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.profile.ProfileActivity"
-            android:parentActivityName=".ui.mainactivity.MainActivity" />
+            android:name=".ui.profile.ProfileActivity" />
         <activity
             android:name=".ui.authentication.SignUp.SignUpActivity" />
         <activity android:name=".ui.authentication.login.LoginActivity">
@@ -50,8 +49,7 @@
         </activity>
 
         <activity
-            android:name=".ui.mainactivity.to_do_list.to_do_page.ToDoActivity"
-            android:parentActivityName=".ui.mainactivity.MainActivity" />
+            android:name=".ui.mainactivity.to_do_list.to_do_page.ToDoActivity" />
         <activity android:name=".ui.mainactivity.MainActivity" />
     </application>
 

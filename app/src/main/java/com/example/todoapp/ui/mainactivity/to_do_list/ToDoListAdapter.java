@@ -52,6 +52,10 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.Recycl
         notifyDataSetChanged();
     }
 
+    public boolean isEmpty() {
+        return toDoModelList.isEmpty();
+    }
+
     public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ItemToDoBinding binding;
         public RecyclerViewHolder(ItemToDoBinding binding) {
@@ -90,7 +94,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.Recycl
             binding.tvTitle.setText(toDoModel.getTitle());
             binding.tvDescription.setText(toDoModel.getDescription());
             binding.getRoot().setOnClickListener(this);
-            binding.cbDone.setOnClickListener(this::onClick);
+            binding.cbDone.setOnClickListener(this);
         }
 
         @Override

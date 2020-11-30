@@ -1,22 +1,17 @@
 package com.example.todoapp.ui.authentication.login;
 
-import androidx.annotation.NonNull;
-
 import com.example.todoapp.base.BasePresenter;
 import com.example.todoapp.cache.SharedPref;
 import com.example.todoapp.model.CategoryModel;
-import com.facebook.AccessToken;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.example.todoapp.model.UserModel;
+import com.example.todoapp.model.type.AccountType;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 public class LoginPresenter extends BasePresenter {
     LoginView view;
@@ -24,74 +19,71 @@ public class LoginPresenter extends BasePresenter {
     public LoginPresenter(LoginView view) {
         super(view);
         this.view = view;
-        firebaseAuth.signOut();
-
     }
 
-    public void loginUser(LoginActivity loginActivity, String email, String password) {
-        firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(loginActivity, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            user = firebaseAuth.getCurrentUser();
-                            getCategories();
-                            view.updateUI();
-                        } else {
-                            view.authError(task);
+    public void isEmailExist(UserModel userModel) {
+        CollectionReference ref = db.collection("users");
+        ref.whereEqualTo("email", userModel.getEmail()).whereEqualTo("type", userModel.getType()).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult().isEmpty()) {
+                    view.updateUI(true, userModel);
+                } else {
+                    for (DocumentSnapshot doc : task.getResult().getDocuments()) {
+                        if (doc.getString("email").equals(userModel.getEmail()) && doc.getString("type").equals(userModel.getType())) {
+                            socialMediaLogin(userModel);
+                            return;
                         }
                     }
-                });
-    }
-
-    public void googleLogin(String idToken){
-        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        firebaseAuth.signInWithCredential(credential)
-                .addOnCompleteListener( new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                         //   Log.d(TAG, "signInWithCredential:success");
-                             user = firebaseAuth.getCurrentUser();
-                            view.updateUI();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            view.authError(task);
-                        }
-
-                        // ...
-                    }
-                });
-    }
-    public void handleFacebookAccessToken(AccessToken token) {
-
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        firebaseAuth.signInWithCredential(credential)
-                .addOnCompleteListener( new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                             user = firebaseAuth.getCurrentUser();
-                            view.updateUI();
-                        } else {
-                            // If sign in fails, display a message to the user.
-
-                            view.authError(task);
-                        }
-
-                        // ...
-                    }
-                });
-    }
-    public void getCategories() {
-        String userID = user.getUid();
-        db.collection("users").document(userID).collection("categories").get().addOnCompleteListener(task -> {
-            for (DocumentSnapshot doc : task.getResult()) {
-                SharedPref.addValue(CategoryModel.getCategory(doc));
+                    view.userAlreadyExist();
+                }
+            } else {
+                view.showError(Objects.requireNonNull(task.getException()).getMessage());
             }
         });
     }
 
+    public void socialMediaLogin(UserModel userModel) {
+        AuthCredential credential;
+        if (userModel.getType().equals(AccountType.GOOGLE)) {
+            credential = GoogleAuthProvider.getCredential(userModel.getIdToken(), null);
+        } else {
+            credential = FacebookAuthProvider.getCredential(userModel.getIdToken());
+        }
+
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        user = firebaseAuth.getCurrentUser();
+                        getCategories(false, userModel);
+                    } else {
+                        view.showError(Objects.requireNonNull(task.getException()).getMessage());
+                    }
+                });
+    }
+
+    public void emailPasswordLogin(LoginActivity loginActivity, String email, String password) {
+        firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(loginActivity, task -> {
+                    if (task.isSuccessful()) {
+                        user = firebaseAuth.getCurrentUser();
+                        getCategories(false, new UserModel(AccountType.EMAIL, email, "null"));
+                    } else {
+                        view.showError(Objects.requireNonNull(task.getException()).getMessage());
+                    }
+                });
+    }
+
+    public void getCategories(boolean isNewAccoount,UserModel userModel) {
+        String userID = user.getUid();
+        db.collection("users").document(userID).collection("categories").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (DocumentSnapshot doc : task.getResult()) {
+                    SharedPref.addValue(CategoryModel.getCategory(doc));
+                }
+                view.updateUI(isNewAccoount,userModel);
+            } else {
+                view.showError(Objects.requireNonNull(task.getException()).getMessage());
+            }
+        });
+    }
 }

@@ -5,6 +5,8 @@ import com.example.todoapp.cache.SharedPref;
 import com.example.todoapp.model.CategoryModel;
 import com.google.firebase.firestore.DocumentReference;
 
+import java.util.Objects;
+
 public class CategoryPresenter extends BasePresenter {
     Categoryview view;
 
@@ -28,21 +30,9 @@ public class CategoryPresenter extends BasePresenter {
             db.collection("users").document(userID).collection("categories").document(id).set(categoryModel.toMap()).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     SharedPref.addValue(categoryModel);
-//                    CollectionReference ref = db.collection("users").document(userID).collection("todoList");
-//                    ref.whereEqualTo("categoryID", categoryModel.getId()).get().addOnCompleteListener(task1 -> {
-//                        if(task1.isSuccessful()){
-//                            for (QueryDocumentSnapshot document : task1.getResult()) {
-//                                ToDoModel toDoModel=ToDoModel.getTodo(document);
-//                                toDoModel.setCategoryColor(color);
-//                                toDoModel.setCategoryTitle( title);
-//                                db.collection("users").document(userID).collection("todoList").document(toDoModel.getId()).
-//                                        set(toDoModel.toMap());
-//                            }
-//                        }
-//                    });
                     view.saved(true);
                 } else {
-                    view.saved(false);
+                    view.showError(Objects.requireNonNull(task.getException()).getMessage());
                 }
             });
         }

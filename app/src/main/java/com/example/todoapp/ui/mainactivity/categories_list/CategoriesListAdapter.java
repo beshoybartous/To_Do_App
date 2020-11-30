@@ -2,10 +2,8 @@ package com.example.todoapp.ui.mainactivity.categories_list;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,21 +13,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todoapp.R;
 import com.example.todoapp.databinding.ItemCategoryBinding;
-import com.example.todoapp.databinding.ItemToDoBinding;
 import com.example.todoapp.model.CategoryModel;
-import com.example.todoapp.model.ToDoModel;
-import com.example.todoapp.ui.mainactivity.to_do_list.ToDoListAdapter;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.RecyclerViewHolder> {
+public class CategoriesListAdapter extends RecyclerView.Adapter<CategoriesListAdapter.RecyclerViewHolder> {
     protected Context context;
     List<CategoryModel> categoryModelList=new ArrayList<>();
     final CategoryClickListener categoryClickListener;
-    public CategoriesAdapter(Context context, CategoryClickListener categoryClickListener){
+
+    public CategoriesListAdapter(Context context, CategoryClickListener categoryClickListener){
         this.context=context;
         this.categoryClickListener=categoryClickListener;
     }
@@ -79,12 +73,9 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Re
         public void onClick(View view) {
             int position = getAdapterPosition();
             if(view.getId()==R.id.btn_delete){
-                Log.d("cliceddelete", "onClick: ");
                 categoryClickListener.categoryOnCLick(categoryModelList.get(position),true);
             }
             else{
-                Log.d("cliceddelete", "onClick:1 ");
-
                 categoryClickListener.categoryOnCLick(categoryModelList.get(position),false);
             }
 

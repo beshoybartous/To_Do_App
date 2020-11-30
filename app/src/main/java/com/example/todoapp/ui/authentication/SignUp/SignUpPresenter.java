@@ -5,15 +5,19 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 
 import com.example.todoapp.base.BasePresenter;
-import com.example.todoapp.model.CategoryModel;
 import com.example.todoapp.model.UserModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.Objects;
 
 public class SignUpPresenter extends BasePresenter {
     SignUpView view;
@@ -23,79 +27,85 @@ public class SignUpPresenter extends BasePresenter {
         this.view = view;
     }
 
-    public void signUpUser(SignUpActivity context, String email, String password, String firstName, String lastName, Uri imageUri) {
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(context, new OnCompleteListener<AuthResult>() {
+    public void signUpSocialMedia(UserModel userModel) {
+        AuthCredential credential;
+        if (userModel.getType().equals("google")) {
+            credential = GoogleAuthProvider.getCredential(userModel.getIdToken(), null);
+        } else {
+            credential = FacebookAuthProvider.getCredential(userModel.getIdToken());
+        }
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        user = firebaseAuth.getCurrentUser();
+                        uploadUserImage(userModel);
+                    } else {
+                        view.showError(Objects.requireNonNull(task.getException()).getMessage());
+                    }
+                });
+    }
+
+    public void signUpUser(UserModel userModel, String password) {
+        firebaseAuth.createUserWithEmailAndPassword(userModel.getEmail(), password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            updateProfile(firstName, lastName, imageUri);
+                            uploadUserImage(userModel);
                         } else {
-                            view.authError(task);
+                            view.showError(Objects.requireNonNull(task.getException()).getMessage());
                         }
                     }
                 });
     }
 
-    private void updateProfile(String firstName, String lastName, Uri imageUri) {
+    private void uploadUserImage(UserModel userModel) {
         user = firebaseAuth.getCurrentUser();
-        StorageReference profileImage = FirebaseStorage.getInstance().getReference("profilepics/" + System.currentTimeMillis() + ".jpg");
-        profileImage.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
-            taskSnapshot.getMetadata().getReference().getDownloadUrl().addOnSuccessListener(uri -> {
-                        UserProfileChangeRequest profileChangeRequest =
-                                new UserProfileChangeRequest
-                                        .Builder().
-                                        setDisplayName(firstName + " " + lastName).
-                                        setPhotoUri(uri).
-                                        build();
-                        user.updateProfile(profileChangeRequest).addOnCompleteListener(task -> {
-                            saveUserData();
-                            createCategory();
-                            view.updateUI();
-                        });
+        StorageReference profileImage = FirebaseStorage.getInstance().getReference("profilepics/" + user.getUid() + ".jpg");
+        profileImage.putFile(Uri.parse(userModel.getImageUri())).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                task.getResult().getMetadata().getReference().getDownloadUrl().addOnCompleteListener(uri -> {
+                    if (uri.isSuccessful()) {
+                        updateUserData(userModel,String.valueOf(uri.getResult()));
+
+                    } else {
+                        view.showError(Objects.requireNonNull(uri.getException()).getMessage());
                     }
-            );
+                });
+            } else {
+                view.showError(Objects.requireNonNull(task.getException()).getMessage());
+            }
         });
     }
 
-    private void saveUserData() {
-        UserModel userModel = new UserModel(user.getUid(),user.getEmail(), user.getDisplayName(), user.getPhotoUrl().toString());
+    private void updateUserData(UserModel userModel, String uri) {
+        userModel.setImageUri(uri);
+        UserProfileChangeRequest profileChangeRequest =
+                new UserProfileChangeRequest
+                        .Builder().
+                        setDisplayName(userModel.getDisplayName()).
+                        setPhotoUri(Uri.parse(userModel.getImageUri())).
+                        build();
+        user.updateProfile(profileChangeRequest).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                saveUserData(userModel.getType());
+            } else {
+                view.showError(Objects.requireNonNull(task.getException()).getMessage());
+            }
+        });
+    }
+
+    private void saveUserData(String emailType) {
+        UserModel userModel = new UserModel(user.getUid(), emailType, user.getEmail(), user.getDisplayName(), user.getPhotoUrl().toString());
         DocumentReference ref = db.collection("users").document(user.getUid());
-        ref.set(userModel.toMap());
+        ref.set(userModel.toMap()).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                view.updateUI();
+            }
+            else{
+                view.showError(Objects.requireNonNull(task.getException()).getMessage());
+            }
+        });
     }
 
-
-    public void createCategory() {
-        if (user != null) {
-
-            String userID = user.getUid();
-
-            DocumentReference ref = db.collection("users").document(userID).collection("categories").document();
-            String id = ref.getId();
-            CategoryModel categoryModel = new CategoryModel(id, "tasks", "#0E2277");
-            db.collection("users").document(userID).collection("categories").document(id).set(categoryModel.toMap());
-
-            ref = db.collection("users").document(userID).collection("categories").document();
-            id = ref.getId();
-            categoryModel = new CategoryModel(id, "match", "#EE0202");
-            db.collection("users").document(userID).collection("categories").document(id).set(categoryModel.toMap());
-
-
-            ref = db.collection("users").document(userID).collection("categories").document();
-            id = ref.getId();
-            categoryModel = new CategoryModel(id, "work", "#510E0E");
-            db.collection("users").document(userID).collection("categories").document(id).set(categoryModel.toMap());
-
-            ref = db.collection("users").document(userID).collection("categories").document();
-            id = ref.getId();
-            categoryModel = new CategoryModel(id, "market", "#EEC902");
-            db.collection("users").document(userID).collection("categories").document(id).set(categoryModel.toMap());
-
-            ref = db.collection("users").document(userID).collection("categories").document();
-            id = ref.getId();
-            categoryModel = new CategoryModel(id, "football", "#0E7720");
-            db.collection("users").document(userID).collection("categories").document(id).set(categoryModel.toMap());
-
-        }
-    }
 }

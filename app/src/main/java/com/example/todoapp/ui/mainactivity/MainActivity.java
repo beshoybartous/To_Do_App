@@ -48,12 +48,9 @@ public class MainActivity extends BaseActivity<MainPresenter, ActivityMainBindin
         viewBinding.bottomNav.setBackground(null);
     }
 
-
     @Override
     public void onStart() {
         super.onStart();
-        presenter.getUserInfo();
-
         EventBus.getDefault().register(this);
     }
 
@@ -72,19 +69,17 @@ public class MainActivity extends BaseActivity<MainPresenter, ActivityMainBindin
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d("calledthere", "onCreateOptionsMenu: ");
         getMenuInflater().inflate(R.menu.menu_tool_bar, menu);
+        presenter.getUserInfo();
         return true;
     }
 
     @Override
     public void getUserInfo(UserModel userModel) {
-        Log.d("calledthere", "getUserInfo: ");
         CircularImageBinding circularImageBinding = CircularImageBinding.bind(this.findViewById(R.id.cl_user_image));
         circularImageBinding.ivUserImage.setOnClickListener(view -> {
             ProfileActivity.startProfileActivity(this, userModel);
         });
-        Picasso.with(viewBinding.getRoot().
-                getContext()).load(userModel.getImageUri()).placeholder(R.drawable.ic_user_place_holder).into(circularImageBinding.ivUserImage);
+        Picasso.get().load(userModel.getImageUri()).placeholder(R.drawable.ic_user_place_holder).into(circularImageBinding.ivUserImage);
     }
 }

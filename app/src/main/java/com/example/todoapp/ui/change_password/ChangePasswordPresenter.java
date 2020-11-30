@@ -7,6 +7,8 @@ import com.example.todoapp.base.BaseView;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 
+import java.util.Objects;
+
 public class ChangePasswordPresenter extends BasePresenter {
     ChangePasswordView view;
     public ChangePasswordPresenter(ChangePasswordView view) {
@@ -14,10 +16,9 @@ public class ChangePasswordPresenter extends BasePresenter {
         this.view=view;
     }
 
-    public void changePassowrd(String oldPassowrd,String newPassword){
+    public void changePassword(String oldPassword, String newPassword){
 
-        AuthCredential credential = EmailAuthProvider
-                .getCredential(user.getEmail(), oldPassowrd);
+        AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), oldPassword);
         user.reauthenticate(credential).addOnCompleteListener(task -> {
             if(task.isSuccessful()){
                 user.updatePassword(newPassword).addOnCompleteListener(task1 -> {
@@ -25,13 +26,12 @@ public class ChangePasswordPresenter extends BasePresenter {
                         signOut();
                     }
                     else{
-                        Log.d("errorr", "changePassowrd: ");
+                        view.showError(Objects.requireNonNull(task1.getException()).getMessage());
                     }
                 });
             }
             else{
-                view.failed();
-                Log.d("errorr", "changePassowrd: ");
+                view.showError(Objects.requireNonNull(task.getException()).getMessage());
             }
         });
     }

@@ -8,6 +8,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ToDoPresenter extends BasePresenter {
     ToDoView view;
@@ -23,10 +24,14 @@ public class ToDoPresenter extends BasePresenter {
             String userID = user.getUid();
             List<CategoryModel> categoryModelList = new ArrayList<>();
             db.collection("users").document(userID).collection("categories").get().addOnCompleteListener(task -> {
-                for (DocumentSnapshot doc : task.getResult()) {
-                    categoryModelList.add(CategoryModel.getCategory(doc));
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot doc : task.getResult()) {
+                        categoryModelList.add(CategoryModel.getCategory(doc));
+                    }
+                    view.getCategoriesView(categoryModelList);
+                } else {
+                    view.showError(Objects.requireNonNull(task.getException()).getMessage());
                 }
-                view.getCategoriesView(categoryModelList);
             });
         }
     }
@@ -48,9 +53,9 @@ public class ToDoPresenter extends BasePresenter {
                     etDueDate);
             db.collection("users").document(userID).collection("todoList").document(id).set(toDoModel.toMap()).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    view.saved(true);
+                    view.saved();
                 } else {
-                    view.saved(false);
+                    view.showError(Objects.requireNonNull(task.getException()).getMessage());
                 }
             });
         }

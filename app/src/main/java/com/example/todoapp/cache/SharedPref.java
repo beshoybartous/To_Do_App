@@ -31,4 +31,12 @@ public class SharedPref {
     public static boolean contain(String categoryID) {
         return categoryList.containsKey(categoryID);
     }
+
+    public static boolean isEmpty(){
+        return categoryList.isEmpty();
+    }
+
+    public static void clear(){
+        categoryList.clear();
+    }
 }

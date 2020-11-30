@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,7 +16,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.example.todoapp.R;
 
-public abstract class BaseFragment<P extends BasePresenter,V extends ViewBinding> extends Fragment {
+public abstract class BaseFragment<P extends BasePresenter,V extends ViewBinding> extends Fragment implements BaseView{
     protected P presenter;
     protected V viewBinding;
 
@@ -44,7 +45,11 @@ public abstract class BaseFragment<P extends BasePresenter,V extends ViewBinding
     protected void hideDialog(){
         loadingDialog.dismiss();
     }
-
+    @Override
+    public void showError(String error) {
+        hideDialog();
+        Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+    }
     @Override
     public void onDestroy() {
         super.onDestroy();

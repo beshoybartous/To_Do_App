@@ -55,7 +55,7 @@ public class CategoryModel implements Serializable {
                 documentSnapshot.getString("title"),
                 documentSnapshot.getString("color"));
     }
-    public Map<String, Object> toMap(){
+    public  Map<String, Object> toMap(){
         return new HashMap<String, Object>() {{
             put("title",title);
             put("color",color);

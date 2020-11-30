@@ -7,5 +7,4 @@ import com.google.firebase.auth.FirebaseUser;
 
 public interface SignUpView extends BaseView {
     void updateUI();
-    void authError(Task<AuthResult> task);
 }

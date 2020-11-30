@@ -11,7 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:text="sssssssss"
+        android:text="Add new category"
+        android:textAllCaps="false"
         android:textAppearance="?attr/textAppearanceHeadline5"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,9 +43,10 @@
         <EditText
             android:id="@+id/et_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:hint="Title" />
+            android:layout_height="match_parent"
+            android:hint="Title"
+            android:inputType="text"
+            android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <ImageButton

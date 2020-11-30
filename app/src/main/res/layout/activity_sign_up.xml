@@ -26,16 +26,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cv_register" />
-            <Button
-                android:id="@+id/btn_login"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Aleardy have an account? Login"
-                android:textAllCaps="false"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btn_sign_up" />
+
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cv_register"
@@ -77,6 +68,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="First Name"
+                            android:drawablePadding="8dp"
+                            android:drawableStart="@drawable/ic_user"
+                            android:inputType="text"
+                            android:maxLines="1"
                             android:importantForAutofill="no" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -95,8 +90,11 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Last Name"
+                            android:drawablePadding="8dp"
+                            android:drawableStart="@drawable/ic_user"
                             android:importantForAutofill="no"
-                            android:inputType="textEmailAddress" />
+                            android:maxLines="1"
+                            android:inputType="text" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -114,7 +112,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Email"
+                            android:drawablePadding="8dp"
+                            android:drawableStart="@drawable/ic_email"
                             android:importantForAutofill="no"
+                            android:maxLines="1"
                             android:inputType="textEmailAddress" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -134,7 +135,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Password"
+                            android:drawablePadding="8dp"
+                            android:drawableStart="@drawable/ic_password"
                             android:importantForAutofill="no"
+                            android:maxLines="1"
                             android:inputType="textPassword" />
                     </com.google.android.material.textfield.TextInputLayout>
 

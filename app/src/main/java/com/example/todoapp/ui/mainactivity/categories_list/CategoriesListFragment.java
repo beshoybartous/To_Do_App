@@ -17,8 +17,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
-public class CategoriesListFragment extends BaseFragment<CategoriesListPresenter, FragmentCategoriesListBinding> implements CategoriesListView, CategoriesAdapter.CategoryClickListener {
-    CategoriesAdapter categoriesAdapter;
+public class CategoriesListFragment extends BaseFragment<CategoriesListPresenter, FragmentCategoriesListBinding> implements CategoriesListView, CategoriesListAdapter.CategoryClickListener {
+    CategoriesListAdapter categoriesListAdapter;
     private static final String KEY_CATEGORY_ITEM = "category";
     AlertDialog deleteDialog;
     @Override
@@ -35,11 +35,8 @@ public class CategoriesListFragment extends BaseFragment<CategoriesListPresenter
     protected void onPostCreated() {
         showDialog();
         deleteDialog=new AlertDialog.Builder(getContext()).create();
-        deleteDialog.setTitle("Delete");
-        deleteDialog.setMessage("This Category will be deleted.\nDo you want to delete it's todo?");
-
-        categoriesAdapter = new CategoriesAdapter(getContext(), CategoriesListFragment.this);
-        viewBinding.rvCategoryList.setAdapter(categoriesAdapter);
+        categoriesListAdapter = new CategoriesListAdapter(getContext(), CategoriesListFragment.this);
+        viewBinding.rvCategoryList.setAdapter(categoriesListAdapter);
         presenter.getCategoriesList();
         viewBinding.fabNewToDo.setOnClickListener(view -> {
             CategoryBottomSheet categoryBottomSheet=new CategoryBottomSheet();
@@ -68,9 +65,8 @@ public class CategoriesListFragment extends BaseFragment<CategoriesListPresenter
 
     @Override
     public void onGetCategoriesList(List<CategoryModel> categoryModelList) {
-        Log.d("onGetCategoriesList", "onGetCategoriesList: ");
-        categoriesAdapter.updateList(categoryModelList);
-        categoriesAdapter.notifyDataSetChanged();
+        categoriesListAdapter.updateList(categoryModelList);
+        categoriesListAdapter.notifyDataSetChanged();
         hideDialog();
     }
 
@@ -81,7 +77,10 @@ public class CategoriesListFragment extends BaseFragment<CategoriesListPresenter
 
     @Override
     public void categoryOnCLick(CategoryModel categoryModel,boolean isDelete) {
+
         if(isDelete){
+            deleteDialog.setTitle("Delete");
+            deleteDialog.setMessage("This Category will be deleted.\nDo you want to delete it's todo?");
             deleteDialog.setButton(Dialog.BUTTON_NEGATIVE, "Delete it's todo", (dialogInterface, i) -> {
                 presenter.deleteCategory(categoryModel, true);
             });

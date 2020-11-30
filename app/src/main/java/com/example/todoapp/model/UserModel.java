@@ -1,20 +1,32 @@
 package com.example.todoapp.model;
 
-import android.graphics.Bitmap;
-import android.net.Uri;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class UserModel implements Serializable {
-    String id,email,displayName,imageUri;
+    String id, type, email, displayName, imageUri, idToken;
+
     public UserModel() {
     }
 
-    public UserModel(String id,String email, String displayName, String imageUri) {
+    public UserModel(String type, String email, String idToken) {
+        this.type = type;
+        this.email = email;
+        this.idToken = idToken;
+    }
+
+    public UserModel(String id, String email, String displayName, String imageUri) {
         this.id = id;
-        this.email=email;
+        this.email = email;
+        this.displayName = displayName;
+        this.imageUri = imageUri;
+    }
+
+    public UserModel(String id, String type, String email, String displayName, String imageUri) {
+        this.id = id;
+        this.type = type;
+        this.email = email;
         this.displayName = displayName;
         this.imageUri = imageUri;
     }
@@ -25,6 +37,14 @@ public class UserModel implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getEmail() {
@@ -51,11 +71,22 @@ public class UserModel implements Serializable {
         this.imageUri = imageUri;
     }
 
-    public Map<String, Object> toMap(){
-        return new HashMap<String, Object>() {{
-            put("title",displayName);
-            put("imageUri",imageUri);
-        }
+    public String getIdToken() {
+        return idToken;
+    }
+
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
+    }
+
+    public Map<String, Object> toMap() {
+        return new HashMap<String, Object>() {
+            {
+                put("email", email);
+                put("type", type);
+                put("title", displayName);
+                put("imageUri", imageUri);
+            }
         };
     }
 }

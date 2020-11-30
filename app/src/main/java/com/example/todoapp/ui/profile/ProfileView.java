@@ -7,4 +7,6 @@ import com.google.firebase.auth.FirebaseUser;
 public interface ProfileView extends BaseView {
     void getUserInfo(UserModel userModel);
     void signOut();
+
+    void socialMediaLogin();
 }

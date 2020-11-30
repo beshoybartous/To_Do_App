@@ -4,6 +4,4 @@ import com.example.todoapp.base.BaseView;
 
 public interface ChangePasswordView extends BaseView {
     void signOut();
-
-    void failed();
 }

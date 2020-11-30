@@ -30,17 +30,17 @@ public class SplashScreenActivity extends BaseActivity<SplashScreenPresenter, Ac
 
     @Override
     protected void onPostCreated() {
-        try {
-            PackageInfo packageInfo=getPackageManager().getPackageInfo("com.example.todoapp", PackageManager.GET_SIGNATURES);
-            for(Signature signature:packageInfo.signatures){
-                MessageDigest md=MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d("mykeyyy", Base64.encodeToString(md.digest(),Base64.DEFAULT));
-
-            }
-        } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            PackageInfo packageInfo=getPackageManager().getPackageInfo("com.example.todoapp", PackageManager.GET_SIGNATURES);
+//            for(Signature signature:packageInfo.signatures){
+//                MessageDigest md=MessageDigest.getInstance("SHA");
+//                md.update(signature.toByteArray());
+//                Log.d("mykeyyy", Base64.encodeToString(md.digest(),Base64.DEFAULT));
+//
+//            }
+//        } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        }
         presenter.checkLoggedIn();
     }
 
